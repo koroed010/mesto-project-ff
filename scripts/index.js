@@ -9,8 +9,8 @@ const placeContainer = document.querySelector('.places__list');
 function createCard(card) {
     const cardAdd = cardTmp.querySelector('.places__item').cloneNode(true);
     cardAdd.querySelector('.card__image').src = card.link;
-    cardAdd.querySelector('.card__image').alt = ('фотография места - ' + card.title);
-    cardAdd.querySelector('.card__title').textContent = card.title;
+    cardAdd.querySelector('.card__image').alt = ('фотография места - ' + card.name);
+    cardAdd.querySelector('.card__title').textContent = card.name;
 
     cardAdd.querySelector('.card__delete-button').addEventListener('click', deleteCard);
 
