@@ -1,0 +1,24 @@
+{
+  "name": "zakrivayuschiy-teg-f",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "",
+    "check": "prettier --check './**/*.{html,css,js}'",
+    "format": "prettier --write './**/*.{html,css,js}'",
+    "lint": "stylelint **/*.css",
+    "lintfix": "stylelint **/*.css -fix",
+    "checkall": "npm run check && npm run lint",
+    "fixall": "npm run format && npm run lintfix"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "stylelint": "^16.5.0"
+  },
+  "devDependencies": {
+    "gulp": "^5.0.0",
+    "prettier": "^3.2.5"
+  }
+}
