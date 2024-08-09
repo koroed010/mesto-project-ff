@@ -8,14 +8,10 @@ import { deleteCard } from './components/card.js';
 // Функция лайка карточки
 import { likeCard } from './components/card.js';
 // функция открытия окна
-import { OpenModal } from './components/modal.js';
-// Функция показа фото
-import { showCardImage } from './components/card.js';
+import { openModal } from './components/modal.js';
 // функция закрытия окна
 import { closeModal } from './components/modal.js';
-// функция сохранения данных профиля
-import { handleFormProfileSubmit } from './components/modal.js';
-import { handleFormPlaceSubmit } from './components/modal.js';
+
 
 // DOM узлы
 const placeContainer = document.querySelector('.places__list');
@@ -25,79 +21,72 @@ initialCards.forEach((place) => {
 });
 
 // переменные для слушателей
-
+const popups = document.querySelectorAll('.popup');
+// Редактировать
+const editButton = document.querySelector('.profile__edit-button');
 const profileEditPopup = document.querySelector('.popup_type_edit');
 const profileTitle = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
 const formEditProfile = document.forms.editProfile;
 const profileEditName = formEditProfile.name;
 const profileEditDescription = formEditProfile.description;
-
+// Добавить(+)
+const addButton = document.querySelector('.profile__add-button');
 const newCardPopup = document.querySelector('.popup_type_new-card');
 const formNewPlace = document.forms.newPlace;
 const newPlaceName = formNewPlace.placeName;
 const newPlaceLink = formNewPlace.link;
+// Показать фотографию крупно
+const imagePopup = document.querySelector('.popup_type_image');
 
-export const imagePopup = document.querySelector('.popup_type_image');
-
-let modalSelected = '';
-let input1 = '';
-let input2 = '';
-let save1 = '';
-let save2 = '';
-let clickTarget = '';
-
-document.addEventListener('click', (evt) => {
-//    console.log(evt.target.classList.value);
-//    console.log(evt.target);
-
-    clickTarget = evt.target.classList.value;
-
-    switch (clickTarget) {
-        case 'profile__edit-button':
-            profileEditName.value = profileTitle.textContent;
-            profileEditDescription.value = profileDescription.textContent;
-            save1 = profileTitle;
-            save2 = profileDescription;
-            input1 = profileEditName;
-            input2 = profileEditDescription;
-            modalSelected = profileEditPopup;
-
-            OpenModal(modalSelected);
-            break;
-
-        case 'profile__add-button':
-            input1 = newPlaceName;
-            input2 = newPlaceLink;
-            input1.value = "";
-            input2.value = "";         
-            modalSelected = newCardPopup;
-
-            OpenModal(modalSelected);
-            break;
-
-        case 'card__image':
-            modalSelected = imagePopup;
-            break;
-
-        case 'popup__close':
-            closeModal(modalSelected);
-            break;            
-    };
-
-// обработка клика по оверлею    
-    if (clickTarget.includes('popup_is-opened')) {
-        closeModal(modalSelected);
-    };
-    
+// слушатели кнопок Редактировать
+editButton.addEventListener('click', () => {
+    profileEditName.value = profileTitle.textContent;
+    profileEditDescription.value = profileDescription.textContent;
+    openModal(profileEditPopup);
+});
+// и Добавить(+)
+addButton.addEventListener('click', () => {
+    newPlaceName.value = "";
+    newPlaceLink.value = "";
+    openModal(newCardPopup);
 });
 
-// слушатели кнопки Сохранить в формах профиля и новой карточки
+// слушатели кнопок Сохранить в формах профиля и новой карточки
+// + функционал по сохранению/добавлению
 formEditProfile.addEventListener('submit', (evt) => {
-    handleFormProfileSubmit(evt, save1, save2, input1, input2, modalSelected);
-});
+    evt.preventDefault();
+    profileTitle.textContent = profileEditName.value;
+    profileDescription.textContent = profileEditDescription.value;
+    closeModal(profileEditPopup);
+});    
 
 formNewPlace.addEventListener('submit', (evt) => {
-    handleFormPlaceSubmit(evt, input1, input2, modalSelected);
+    evt.preventDefault();
+    const tempCard = {
+        name: "",
+        link: "",
+    };
+    tempCard.name = newPlaceName.value;
+    tempCard.link = newPlaceLink.value;
+    document.querySelector('.places__list').prepend(createCard(tempCard, deleteCard, likeCard, showCardImage));
+    closeModal(newCardPopup);
 });
 
+// Функция показа фото
+function showCardImage(showCardLink, showCardTitle) {
+    document.querySelector('.popup__image').src = showCardLink;
+    document.querySelector('.popup__caption').textContent = showCardTitle;
+    openModal(imagePopup);
+};
+
+// обработка клика по кнопке закрытия для каждого попапа
+// + обработка клика по оверлею для каждого попапа
+popups.forEach((modal) => {
+    modal.addEventListener('click', (evt) => {
+        let clickTarget = evt.target.classList.value;
+        if (clickTarget.includes('popup_is-opened') || clickTarget === 'popup__close') {
+            closeModal(modal);
+        }
+    });
+});
