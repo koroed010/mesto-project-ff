@@ -5,6 +5,11 @@
 @import url('./__delete-button/card__delete-button.css');
 @import url('./__title/card__title.css');
 
+@import url('./__like_group/card__like_group.css');
+@import url('./__likes_amount/card__likes_amount.css');
+@import url('./__likes_amount/-hidden/card__likes_amount-hidden.css');
+@import url('./__id/card__id.css');
+
 .card {
   font-family: 'Inter', Arial, sans-serif;
   -webkit-border-radius: 10px;

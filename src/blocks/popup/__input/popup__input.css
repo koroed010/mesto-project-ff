@@ -8,6 +8,8 @@
   box-sizing: border-box;
   padding: 10px 0 0;
   margin-bottom: 10px;
+  outline-color: transparent;
+  background-color: transparent;
 }
 
 .popup__input:last-of-type {
@@ -15,6 +17,7 @@
 }
 
 @media screen and (max-width: 568px) {
+  
   .popup__title {
     font-size: 12px;
     line-height: 15px;

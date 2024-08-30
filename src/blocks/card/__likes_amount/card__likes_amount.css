@@ -1,0 +1,14 @@
+.card__likes_amount {
+    width: min-content;
+    height: 13px;
+    margin-block: 0;
+    margin-inline-end: 0;
+    
+    font-family: Inter;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 15.73px;
+    text-align: center;
+    color: black;
+
+}
