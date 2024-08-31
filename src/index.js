@@ -9,7 +9,7 @@ import { cardToDel } from './components/card.js';
 // Функция лайка карточки
 import { likeCard } from './components/card.js';
 // функция открытия окна
-import { openModal } from './components/modal.js';
+import { closeByEscape } from './components/modal.js';
 // функция закрытия окна
 import { closeModal } from './components/modal.js';
 
@@ -61,6 +61,8 @@ const newPlaceLink = formNewPlace.link;
 
 // Показать фотографию крупно
 const imagePopup = document.querySelector('.popup_type_image');
+const popupImage = document.querySelector('.popup__image');
+const popupCaption = document.querySelector('.popup__caption');
 
 // Подтвердить удаление карточки
 const confirmPopup  = document.querySelector('.popup_type_confirm');
@@ -69,53 +71,57 @@ const formConfirm = document.forms.confirm;
 
 // отрисовка страницы - вывод профиля пользователя и карточек мест
 // запрос данных о профиле пользователя
-const promise1 = new Promise((resolve) => {
+const promiseProfile = new Promise((resolve) => {
     resolve(getProfile())
 });
 
 // запрос карточек с сервера
-const promise2 = new Promise((resolve) => {
+const promiseCards = new Promise((resolve) => {
     resolve(getInitialCards())
 })
 
 // Выводим данные пользователя и карточки на страницу
-Promise.all([promise1, promise2])
-.then(([res1, res2]) => {
-    profileTitle.textContent = res1.name;
-    profileDescription.textContent = res1.about;
-    profileImage.style = `background-image: url(${res1.avatar})`;
-    ownerId = res1._id;
-    res2.forEach((place) => {
+Promise.all([promiseProfile, promiseCards])
+.then(([resProfile, resCards]) => {
+    profileTitle.textContent = resProfile.name;
+    profileDescription.textContent = resProfile.about;
+    profileImage.style = `background-image: url(${resProfile.avatar})`;
+    ownerId = resProfile._id;
+    resCards.forEach((place) => {
         placeContainer.append(createCard(place, deleteCard, likeCard, showCardImage, ownerId));
     })
-}); 
+})
+.catch((err) => {
+    console.log(err); // выводим ошибку в консоль
+});
 
 // настройки для сброса состояния полей, связанных с валидацией ввода данных
 const validationConfig = {
     inputSelector: '.popup__input',
     inputErrorClass: 'popup__input_type_error',
-    errorClass: 'popup__error_visible'
+    errorClass: 'popup__error_visible',
+    submitButtonSelector: '.popup__button',
+    inactiveButtonClass: 'popup__button_disabled'
 };
 
 // слушатели кнопок Редактировать
 editButton.addEventListener('click', () => {
     profileEditName.value = profileTitle.textContent;
     profileEditDescription.value = profileDescription.textContent;
-    profileEditButton.textContent = 'Сохранить';
+//    profileEditButton.textContent = 'Сохранить';
 // сброс состояния ошибки, которое могло остаться от предыдущего открытия
     clearValidation(formEditProfile, validationConfig);
-
+// включаем кнопку "Сохранить" перед открытием формы
+    const submitButton = formEditProfile.querySelector('.popup__button');
+    submitButton.disabled = false;
+    submitButton.classList.remove('popup__button_disabled');
     openModal(profileEditPopup);
 });
 // и Добавить(+)
 addButton.addEventListener('click', () => {
-    newPlaceName.value = "";
-    newPlaceLink.value = "";
-    newCardButton.textContent = 'Сохранить';
-// выключаем кнопку "Сохранить" перед открытием пустой формы
-    const submitButton = formNewPlace.querySelector('.popup__button');
-    submitButton.disabled = true;
-    submitButton.classList.add('popup__button_disabled');
+    newPlaceName.value = '';
+    newPlaceLink.value = '';
+//    newCardButton.textContent = 'Сохранить';
 // сброс состояния ошибки, которое могло остаться от предыдущего открытия
     clearValidation(formNewPlace, validationConfig);
 
@@ -125,7 +131,7 @@ addButton.addEventListener('click', () => {
 // слушатель на аватар пользователя и его редактирование
 profileImage.addEventListener('click', () => {
     profileEditImageLink.value = '';
-    ImageEditButton.textContent = 'Сохранить';
+//    ImageEditButton.textContent = 'Сохранить';
 // сброс состояния ошибки, которое могло остаться от предыдущего открытия
     clearValidation(formEditProfileImage, validationConfig);
 
@@ -142,9 +148,15 @@ formEditProfile.addEventListener('submit', (evt) => {
     editProfile(profileEditName, profileEditDescription)
     .then (() => {
         profileTitle.textContent = profileEditName.value;
-        profileDescription.textContent = profileEditDescription.value
+        profileDescription.textContent = profileEditDescription.value;
+        closeModal(profileEditPopup);
+    })
+    .catch((err) => {
+        console.log(err); // выводим ошибку в консоль
+    })
+    .finally (() => {
+        profileEditButton.textContent = 'Сохранить';
     });
-    closeModal(profileEditPopup);
 });    
 
 formNewPlace.addEventListener('submit', (evt) => {
@@ -155,8 +167,14 @@ formNewPlace.addEventListener('submit', (evt) => {
     .then((res) => {
     //    console.log(res);
         document.querySelector('.places__list').prepend(createCard(res, deleteCard, likeCard, showCardImage, ownerId));
-    });
-    closeModal(newCardPopup);
+        closeModal(newCardPopup);
+    })
+    .catch((err) => {
+        console.log(err); // выводим ошибку в консоль
+    })
+    .finally (() => {
+        newCardButton.textContent = 'Сохранить';
+    }); 
 });
 
 // меняем аватарку
@@ -167,8 +185,14 @@ formEditProfileImage.addEventListener('submit', (evt) => {
     changeAvatarLink(profileEditImageLink)
     .then ((res) => {
         profileImage.style = `background-image: url(${res.avatar})`;
-    });
-    closeModal(profileImageEditPopup);
+        closeModal(profileImageEditPopup);
+    })
+    .catch((err) => {
+        console.log(err); // выводим ошибку в консоль
+    })
+    .finally (() => {
+        ImageEditButton.textContent = 'Сохранить';
+    }); 
 });
 
 
@@ -176,8 +200,9 @@ formEditProfileImage.addEventListener('submit', (evt) => {
 
 // Функция показа фото
 function showCardImage(showCardLink, showCardTitle) {
-    document.querySelector('.popup__image').src = showCardLink;
-    document.querySelector('.popup__caption').textContent = showCardTitle;
+    popupImage.src = showCardLink;
+    popupImage.alt = showCardTitle;
+    popupCaption.textContent = showCardTitle;
     openModal(imagePopup);
 };
 
@@ -213,12 +238,18 @@ formConfirm.addEventListener('submit', (evt) => {
 // отправляем запрос на удаление карточки на сервер
     removeCard(cardToDelId)
     .then(() => {
-        cardToDel.remove();
-        formConfirm.removeEventListener('submit', (evt))
+        cardToDel.remove()
     })
+    .catch((err) => {
+        console.log(err); // выводим ошибку в консоль
+    });
     closeModal(confirmPopup);
 });
 
 
-
+// функция открытия окна
+export function openModal(modal) {
+    modal.classList.add('popup_is-opened');
+    document.addEventListener('keydown', closeByEscape);
+};
 

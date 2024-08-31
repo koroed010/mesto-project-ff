@@ -1,5 +1,5 @@
 // функция открытия окна
-import { openModal } from './modal.js';
+import { openModal } from '../index.js';
 
 // импорт запроса обработки лайка
 import { toggleCardLike } from './api.js';
@@ -66,8 +66,12 @@ export function likeCard(evt) {
     toggleCardLike(cardToLikeId, likeMethod)
     .then((res) => {
         cardLikesAmount.textContent = res.likes.length;
+        evt.target.classList.toggle('card__like-button_is-active');
     })
-    evt.target.classList.toggle('card__like-button_is-active');
+    .catch((err) => {
+        console.log(err); // выводим ошибку в консоль
+    }); 
+    
 }
 
 

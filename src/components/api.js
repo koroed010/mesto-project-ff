@@ -1,3 +1,5 @@
+import { checkResponse } from '../utils/utils.js';
+
 const config = {
     baseUrl: 'https://mesto.nomoreparties.co/v1/wff-cohort-21',
     headers: {
@@ -12,15 +14,7 @@ export const getProfile = () => {
     method: 'GET',
     headers: config.headers,
     })
-    .then(res => {
-        if (res.ok) {
-            return res.json();
-        }             // если ошибка, отклоняем промис
-        return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .catch((err) => {
-        console.log(err); // выводим ошибку в консоль
-    }); 
+    .then(checkResponse)
 }
 
 // запрос на получение всех карточек
@@ -29,15 +23,7 @@ export const getInitialCards = () => {
     method: 'GET',
     headers: config.headers,
     })
-    .then(res => {
-        if (res.ok) {
-            return res.json();
-        } 
-        return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .catch((err) => {
-        console.log(err); // выводим ошибку в консоль
-    }); 
+    .then(checkResponse)
 }
 
 // отправляем на сервер обновленные данные пользователя
@@ -51,15 +37,7 @@ export function editProfile(profileEditName, profileEditDescription) {
         about: profileEditDescription.value
         })
     })
-    .then(res => {
-        if (res.ok) {
-            return res.json();
-        };
-        return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .catch((err) => {
-        console.log(err); // выводим ошибку в консоль
-    }); 
+    .then(checkResponse)
 }
 
 // отправляем на сервер новую карточку
@@ -72,15 +50,7 @@ export function addNewPlaceCard(newPlaceName, newPlaceLink) {
         link: newPlaceLink.value
         })
     })
-    .then(res => {
-        if (res.ok) {
-            return res.json();
-        };
-        return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .catch((err) => {
-        console.log(err); // выводим ошибку в консоль
-    }); 
+    .then(checkResponse)
 }
 
 // отправляем на сервер обновленную ссылку на аватар
@@ -92,10 +62,7 @@ export function changeAvatarLink(profileEditImageLink) {
         avatar: profileEditImageLink.value
         })
     })
-    .then(res => res.json())
-    .catch((err) => {
-        console.log(err); // выводим ошибку в консоль
-    }); 
+    .then(checkResponse)
 }
 
 // отправляем на сервер запрос на удаление карточки
@@ -104,9 +71,6 @@ export function removeCard(cardToDelId) {
         method: 'DELETE',
         headers: config.headers
     })
-    .catch((err) => {
-        console.log(err); // выводим ошибку в консоль
-    }); 
 }
 
 // запрос на постановку/снятие лайка
@@ -115,8 +79,5 @@ export function toggleCardLike(cardToLikeId, likeMethod) {
         method: likeMethod,
         headers: config.headers
     })
-    .then(res => res.json())
-    .catch((err) => {
-        console.log(err); // выводим ошибку в консоль
-    });
+    .then(checkResponse)
 }

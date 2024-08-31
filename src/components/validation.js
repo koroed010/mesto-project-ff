@@ -53,9 +53,12 @@ export function enableValidation ({
 export function clearValidation(formElement, {
     inputSelector,
     inputErrorClass,
-    errorClass
+    errorClass,
+    submitButtonSelector,
+    inactiveButtonClass
 }) {
     const inputList = Array.from(formElement.querySelectorAll(inputSelector));
+    const submitButton = formElement.querySelector(submitButtonSelector);
     inputList.forEach((inputElement) => {
         if (inputElement.classList.contains(inputErrorClass)) {
             const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
@@ -63,5 +66,8 @@ export function clearValidation(formElement, {
             errorElement.classList.remove(errorClass);
             errorElement.textContent = '';
         };
-    })
+    });
+// выключаем кнопку "Сохранить" перед открытием пустой формы
+    submitButton.disabled = true;
+    submitButton.classList.add(inactiveButtonClass);   
 };
