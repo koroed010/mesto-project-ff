@@ -1,16 +1,9 @@
-// функция открытия окна
-import { openModal } from '../index.js';
 
 // импорт запроса обработки лайка
 import { toggleCardLike } from './api.js';
 
-
 // Темплейт карточки
 const cardTmp = document.querySelector('#card-template').content;
-
-const confirmPopup  = document.querySelector('.popup_type_confirm');
-export let cardToDel = '';
-export let cardToDelId = '';
 
 // Функция создания карточки
 export function createCard(card, deleteCard, likeCard, showCardImage, ownerId) {
@@ -30,27 +23,21 @@ export function createCard(card, deleteCard, likeCard, showCardImage, ownerId) {
         }
     });
 
-// слушатели удаления, лайка карточки, показа фото крупным планом
+// слушатель удаления
     if (card.owner._id === ownerId) {
         cardDeleteButton.addEventListener('click', deleteCard);
     } else {
         cardDeleteButton.setAttribute('disabled', true)
     };
+// слушатель лайка карточки
     cardLikeButton.addEventListener('click', likeCard);
+// слушатель показа фото крупным планом
     cardAddImage.addEventListener('click', function () {
         showCardImage(card.link, card.name)
     });
     return cardAdd;
 };
 
-// Функция удаления карточки
-export function deleteCard(evt) {
-    cardToDel = evt.target.closest('.places__item');
-    cardToDelId = cardToDel.querySelector('.card__id');
-
-    openModal(confirmPopup);
-    return cardToDel, cardToDelId.textContent;
-};
 
 
 // Функция лайка карточки
@@ -71,7 +58,4 @@ export function likeCard(evt) {
     .catch((err) => {
         console.log(err); // выводим ошибку в консоль
     }); 
-    
 }
-
-

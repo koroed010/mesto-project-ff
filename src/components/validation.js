@@ -23,13 +23,12 @@ export function enableValidation ({
                         inputElement.setCustomValidity("");
                     };
 
+                    const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
                     if (!inputElement.validity.valid) {
-                        const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
                         inputElement.classList.add(inputErrorClass);
-                        errorElement.textContent = inputElement.validationMessage;
                         errorElement.classList.add(errorClass);
+                        errorElement.textContent = inputElement.validationMessage;
                     } else {
-                        const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
                         inputElement.classList.remove(inputErrorClass);
                         errorElement.classList.remove(errorClass);
                         errorElement.textContent = '';

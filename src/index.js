@@ -2,14 +2,10 @@
 import './pages/index.css'; // добавьте импорт главного файла стилей
 // Функция создания карточки
 import { createCard } from './components/card.js';
-// Функция удаления карточки
-import { deleteCard } from './components/card.js';
-import { cardToDelId } from './components/card.js';
-import { cardToDel } from './components/card.js';
 // Функция лайка карточки
 import { likeCard } from './components/card.js';
 // функция открытия окна
-import { closeByEscape } from './components/modal.js';
+import { openModal } from './components/modal.js';
 // функция закрытия окна
 import { closeModal } from './components/modal.js';
 
@@ -21,12 +17,10 @@ import { addNewPlaceCard } from './components/api.js';
 import { changeAvatarLink } from './components/api.js';
 import { removeCard } from './components/api.js';
 
-
 // функция включения валидации всех форм
 import { enableValidation } from './components/validation.js';
 // функция очистки ошибок валидации всех форм
 import { clearValidation } from './components/validation.js';
-
 
 // DOM узлы
 const placeContainer = document.querySelector('.places__list');
@@ -67,7 +61,8 @@ const popupCaption = document.querySelector('.popup__caption');
 // Подтвердить удаление карточки
 const confirmPopup  = document.querySelector('.popup_type_confirm');
 const formConfirm = document.forms.confirm;
-
+let cardToDel = '';
+let cardToDelId = '';
 
 // отрисовка страницы - вывод профиля пользователя и карточек мест
 // запрос данных о профиле пользователя
@@ -111,10 +106,6 @@ editButton.addEventListener('click', () => {
 //    profileEditButton.textContent = 'Сохранить';
 // сброс состояния ошибки, которое могло остаться от предыдущего открытия
     clearValidation(formEditProfile, validationConfig);
-// включаем кнопку "Сохранить" перед открытием формы
-    const submitButton = formEditProfile.querySelector('.popup__button');
-    submitButton.disabled = false;
-    submitButton.classList.remove('popup__button_disabled');
     openModal(profileEditPopup);
 });
 // и Добавить(+)
@@ -137,7 +128,6 @@ profileImage.addEventListener('click', () => {
 
     openModal(profileImageEditPopup);
 });
-
 
 // слушатели кнопок Сохранить в формах: профиля, новой карточки и замены аватара
 // + функционал по сохранению/добавлению
@@ -166,7 +156,7 @@ formNewPlace.addEventListener('submit', (evt) => {
     addNewPlaceCard(newPlaceName, newPlaceLink)
     .then((res) => {
     //    console.log(res);
-        document.querySelector('.places__list').prepend(createCard(res, deleteCard, likeCard, showCardImage, ownerId));
+    placeContainer.prepend(createCard(res, deleteCard, likeCard, showCardImage, ownerId));
         closeModal(newCardPopup);
     })
     .catch((err) => {
@@ -195,9 +185,6 @@ formEditProfileImage.addEventListener('submit', (evt) => {
     }); 
 });
 
-
-
-
 // Функция показа фото
 function showCardImage(showCardLink, showCardTitle) {
     popupImage.src = showCardLink;
@@ -205,7 +192,6 @@ function showCardImage(showCardLink, showCardTitle) {
     popupCaption.textContent = showCardTitle;
     openModal(imagePopup);
 };
-
 
 // обработка клика по кнопке закрытия для каждого попапа
 // + обработка клика по оверлею для каждого попапа
@@ -220,7 +206,6 @@ popups.forEach((modal) => {
 
 // включение валидации вызовом enableValidation
 // все настройки передаются при вызове
-
 enableValidation({
     formSelector: '.popup__form',
     inputSelector: '.popup__input',
@@ -229,7 +214,6 @@ enableValidation({
     inputErrorClass: 'popup__input_type_error',
     errorClass: 'popup__error_visible'
   }); 
-  
 
 // слушатель кнопки Да в форме подтверждения (удаления карточки) + удаление с сервера
 formConfirm.addEventListener('submit', (evt) => {
@@ -238,18 +222,19 @@ formConfirm.addEventListener('submit', (evt) => {
 // отправляем запрос на удаление карточки на сервер
     removeCard(cardToDelId)
     .then(() => {
-        cardToDel.remove()
+        cardToDel.remove();
+        closeModal(confirmPopup);
     })
     .catch((err) => {
         console.log(err); // выводим ошибку в консоль
     });
-    closeModal(confirmPopup);
 });
 
+// Функция удаления карточки
+export function deleteCard(evt) {
+    cardToDel = evt.target.closest('.places__item');
+    cardToDelId = cardToDel.querySelector('.card__id');
 
-// функция открытия окна
-export function openModal(modal) {
-    modal.classList.add('popup_is-opened');
-    document.addEventListener('keydown', closeByEscape);
+    openModal(confirmPopup);
+    return cardToDel, cardToDelId.textContent;
 };
-
